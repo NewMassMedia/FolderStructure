@@ -43,9 +43,9 @@ if (-not $looksLikeAssets -and -not $Force) {
 # --- 폴더 정의 ---------------------------------------------------------------
 $themeContent = @("Prop/Texture","Prop/Material","Prop/Mesh","Prop/Prefab",
                   "Environment/Texture","Environment/Material","Environment/Mesh","Environment/Prefab",
-                  "Animation","VFX","Audio")
-$themeShared  = @("Texture","Material","Mesh","Prefab","Animation","VFX","Audio")
-$charDirs     = @("Mesh","Texture","Material","Animation","Prefab")
+                  "Animation/Controller","Animation/Clip","VFX","Audio")
+$themeShared  = @("Texture","Material","Mesh","Prefab","Animation/Controller","Animation/Clip","VFX","Audio")
+$charDirs     = @("Mesh","Texture","Material","Animation/Controller","Animation/Clip","Prefab")
 
 $dirs = New-Object System.Collections.Generic.List[string]
 
@@ -60,7 +60,7 @@ $dirs.AddRange([string[]]@(
     "_Project/Art/Shader/Script","_Project/Art/Shader/ShaderGraph",
     "_Project/Art/VFX/Particle","_Project/Art/VFX/VFXGraph",
     "_Project/Art/Timeline",
-    "_Project/UI/Font","_Project/UI/Sprite","_Project/UI/Prefab","_Project/UI/Animation",
+    "_Project/UI/Font","_Project/UI/Sprite","_Project/UI/Prefab","_Project/UI/Animation/Controller","_Project/UI/Animation/Clip",
     "_Project/UI/UIToolkit/USS","_Project/UI/UIToolkit/UXML","_Project/UI/UIToolkit/Theme",
     "_Project/UI/UIToolkit/Setting","_Project/UI/UIToolkit/Extension",
     "_Project/Prefab/System","_Project/Prefab/Gameplay",

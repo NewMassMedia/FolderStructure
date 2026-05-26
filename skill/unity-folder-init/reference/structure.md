@@ -13,13 +13,13 @@ Assets/
 │  │  ├─ Themes/{_Shared, _Template, ThemeA}/
 │  │  │    ├─ Prop/{Texture,Material,Mesh,Prefab}        # _Shared는 카테고리 없이 바로 타입
 │  │  │    ├─ Environment/{Texture,Material,Mesh,Prefab}
-│  │  │    └─ Animation, VFX, Audio                      # 테마 전용
-│  │  ├─ Characters/{_Shared,_Template,CharacterA}/{Mesh,Texture,Material,Animation,Prefab}
+│  │  │    └─ Animation/{Controller,Clip}, VFX, Audio     # 테마 전용
+│  │  ├─ Characters/{_Shared,_Template,CharacterA}/{Mesh,Texture,Material,Animation/{Controller,Clip},Prefab}
 │  │  ├─ Audio/{Mixer,Music,Sound}      # 범용
 │  │  ├─ Shader/{ShaderGraph,Script}
 │  │  ├─ VFX/{Particle,VFXGraph}        # 범용
 │  │  └─ Timeline/                      # 컷신/Timeline·Signal
-│  ├─ UI/{Font,Sprite,Prefab,Animation, UIToolkit/{USS,UXML,Theme,Setting,Extension}}
+│  ├─ UI/{Font,Sprite,Prefab,Animation/{Controller,Clip}, UIToolkit/{USS,UXML,Theme,Setting,Extension}}
 │  ├─ Prefab/{System,Gameplay}          # 아트가 아닌 시스템/게임플레이 프리팹
 │  ├─ Scene/{Dev,Production,UI,Test}
 │  ├─ Script/{Core, Editor, Features/_Template/{Runtime,Editor,Tests}}
