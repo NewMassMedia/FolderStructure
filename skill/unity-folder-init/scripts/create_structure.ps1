@@ -8,12 +8,19 @@
     대상 Unity Assets 폴더 경로. 기본값은 현재 폴더.
 .PARAMETER Force
     Assets 폴더가 아닌 곳(ProjectSettings 형제 없음)에도 강제로 생성.
+.PARAMETER MigrateDefaults
+    Unity 기본 폴더/에셋을 새 구조로 이동한다(기본 켜짐). .meta를 항상 동반 이동한다.
+      Scenes/*              -> _Project/Scene/Dev
+      Settings/*            -> _Project/Settings/RenderPipeline
+      *.inputactions        -> _Project/Settings/Input
+    끄려면 -MigrateDefaults:$false. Unity는 닫고 실행할 것을 권장한다.
 .EXAMPLE
     ./create_structure.ps1 -AssetsPath "C:\MyUnityProject\Assets"
 #>
 param(
     [string]$AssetsPath = (Get-Location).Path,
-    [switch]$Force
+    [switch]$Force,
+    [bool]$MigrateDefaults = $true
 )
 
 $ErrorActionPreference = "Stop"
@@ -79,6 +86,75 @@ foreach ($d in $dirs) {
 }
 Write-Host "[OK] $created 개 폴더 생성/확인 (대상: $AssetsPath)" -ForegroundColor Green
 Write-Host "[i] asmdef는 생성하지 않았습니다 — 코드 작성 시 Features/_Template를 복사해 만드세요." -ForegroundColor Cyan
+
+# --- Unity 기본 폴더 마이그레이션 -------------------------------------------
+# 에셋과 .meta를 항상 함께 옮긴다(GUID 보존 → 참조 유지). 같은 이름이 대상에 있으면 건너뛴다.
+function Move-AssetWithMeta {
+    param([string]$Src, [string]$DestDir)
+    if (-not (Test-Path $Src)) { return $false }
+    $name = Split-Path $Src -Leaf
+    $destPath = Join-Path $DestDir $name
+    if (Test-Path $destPath) { Write-Warning "  이미 존재해 건너뜀: $name"; return $false }
+    New-Item -ItemType Directory -Path $DestDir -Force | Out-Null
+    Move-Item -LiteralPath $Src -Destination $destPath
+    $meta = "$Src.meta"
+    if (Test-Path $meta) { Move-Item -LiteralPath $meta -Destination "$destPath.meta" }
+    Write-Host "  이동: $name" -ForegroundColor DarkGray
+    return $true
+}
+
+# 비워진 기본 폴더와 그 .meta 제거
+function Remove-IfEmptyFolder {
+    param([string]$Dir)
+    if ((Test-Path $Dir) -and -not (Get-ChildItem -LiteralPath $Dir -Force | Where-Object { $_.Name -ne ".gitkeep" })) {
+        Remove-Item -LiteralPath $Dir -Recurse -Force
+        $m = "$Dir.meta"; if (Test-Path $m) { Remove-Item -LiteralPath $m -Force }
+        Write-Host "  빈 기본 폴더 제거: $(Split-Path $Dir -Leaf)" -ForegroundColor DarkGray
+    }
+}
+
+if ($MigrateDefaults) {
+    Write-Host "[i] Unity 기본 폴더 마이그레이션..." -ForegroundColor Cyan
+    # Scenes/* -> Scene/Dev
+    $scenesDir = Join-Path $AssetsPath "Scenes"
+    if (Test-Path $scenesDir) {
+        Get-ChildItem -LiteralPath $scenesDir -File | Where-Object { $_.Extension -ne ".meta" } |
+            ForEach-Object { Move-AssetWithMeta $_.FullName (Join-Path $AssetsPath "_Project/Scene/Dev") | Out-Null }
+        Remove-IfEmptyFolder $scenesDir
+    }
+    # Settings/* -> Settings/RenderPipeline
+    $settingsDir = Join-Path $AssetsPath "Settings"
+    if (Test-Path $settingsDir) {
+        Get-ChildItem -LiteralPath $settingsDir -File | Where-Object { $_.Extension -ne ".meta" } |
+            ForEach-Object { Move-AssetWithMeta $_.FullName (Join-Path $AssetsPath "_Project/Settings/RenderPipeline") | Out-Null }
+        Remove-IfEmptyFolder $settingsDir
+    }
+    # *.inputactions (Assets 루트) -> Settings/Input
+    Get-ChildItem -LiteralPath $AssetsPath -File -Filter "*.inputactions" |
+        ForEach-Object { Move-AssetWithMeta $_.FullName (Join-Path $AssetsPath "_Project/Settings/Input") | Out-Null }
+}
+
+# --- gitkeep 보장 패스 -------------------------------------------------------
+# _Project/_Sandbox/Plugins/ThirdParty 아래에서 "내용물이 전혀 없는 빈 폴더"에 .gitkeep을 채운다.
+# (이동으로 내용이 생긴 폴더의 .gitkeep은 정리한다.)
+$roots = @("_Project","_Sandbox","Plugins","ThirdParty") | ForEach-Object { Join-Path $AssetsPath $_ } | Where-Object { Test-Path $_ }
+$keepAdded = 0; $keepRemoved = 0
+foreach ($root in $roots) {
+    Get-ChildItem -LiteralPath $root -Recurse -Directory | ForEach-Object {
+        $children = Get-ChildItem -LiteralPath $_.FullName -Force
+        $hasSub  = $children | Where-Object { $_.PSIsContainer }
+        $real    = $children | Where-Object { -not $_.PSIsContainer -and $_.Name -ne ".gitkeep" }
+        $keep    = Join-Path $_.FullName ".gitkeep"
+        if (-not $hasSub -and -not $real) {
+            if (-not (Test-Path $keep)) { New-Item -ItemType File -Path $keep | Out-Null; $keepAdded++ }
+        } elseif (Test-Path $keep) {
+            # 실제 내용이 생겼으니 불필요한 .gitkeep 제거
+            Remove-Item -LiteralPath $keep -Force; $keepRemoved++
+            $km = "$keep.meta"; if (Test-Path $km) { Remove-Item -LiteralPath $km -Force }
+        }
+    }
+}
+Write-Host "[OK] gitkeep 보장: 추가 $keepAdded, 불필요 제거 $keepRemoved" -ForegroundColor Green
 
 # --- 검증 --------------------------------------------------------------------
 & (Join-Path $PSScriptRoot "verify_structure.ps1") -AssetsPath $AssetsPath

@@ -54,6 +54,54 @@ done
 echo "[OK] $count 개 폴더 생성/확인 (대상: $ASSETS)"
 echo "[i] asmdef는 생성하지 않았습니다 — 코드 작성 시 Features/_Template를 복사해 만드세요."
 
+# --- Unity 기본 폴더 마이그레이션 (.meta 동반 이동, GUID 보존) ---
+move_with_meta() { # $1=src file, $2=dest dir
+  local src="$1" destdir="$2" name
+  name="$(basename "$src")"
+  [[ -e "$destdir/$name" ]] && { echo "  이미 존재해 건너뜀: $name"; return; }
+  mkdir -p "$destdir"
+  mv "$src" "$destdir/$name"
+  [[ -f "$src.meta" ]] && mv "$src.meta" "$destdir/$name.meta"
+  echo "  이동: $name"
+}
+remove_if_empty() { # $1=dir  (.gitkeep만 있으면 빈 것으로 간주)
+  local dir="$1"
+  [[ -d "$dir" ]] || return
+  if [[ -z "$(find "$dir" -mindepth 1 ! -name .gitkeep -print -quit)" ]]; then
+    rm -rf "$dir"; [[ -f "$dir.meta" ]] && rm -f "$dir.meta"
+    echo "  빈 기본 폴더 제거: $(basename "$dir")"
+  fi
+}
+if [[ "${MIGRATE_DEFAULTS:-1}" == "1" ]]; then
+  echo "[i] Unity 기본 폴더 마이그레이션..."
+  if [[ -d "$ASSETS/Scenes" ]]; then
+    find "$ASSETS/Scenes" -maxdepth 1 -type f ! -name '*.meta' -print0 |
+      while IFS= read -r -d '' f; do move_with_meta "$f" "$ASSETS/_Project/Scene/Dev"; done
+    remove_if_empty "$ASSETS/Scenes"
+  fi
+  if [[ -d "$ASSETS/Settings" ]]; then
+    find "$ASSETS/Settings" -maxdepth 1 -type f ! -name '*.meta' -print0 |
+      while IFS= read -r -d '' f; do move_with_meta "$f" "$ASSETS/_Project/Settings/RenderPipeline"; done
+    remove_if_empty "$ASSETS/Settings"
+  fi
+  find "$ASSETS" -maxdepth 1 -type f -name '*.inputactions' -print0 |
+    while IFS= read -r -d '' f; do move_with_meta "$f" "$ASSETS/_Project/Settings/Input"; done
+fi
+
+# --- gitkeep 보장 패스: 빈 폴더엔 .gitkeep 채우고, 내용 생긴 폴더의 .gitkeep은 제거 ---
+ka=0; kr=0
+for root in _Project _Sandbox Plugins ThirdParty; do
+  [[ -d "$ASSETS/$root" ]] || continue
+  while IFS= read -r -d '' d; do
+    if [[ -z "$(find "$d" -mindepth 1 ! -name .gitkeep -print -quit)" ]]; then
+      [[ -f "$d/.gitkeep" ]] || { touch "$d/.gitkeep"; ka=$((ka+1)); }
+    elif [[ -f "$d/.gitkeep" ]]; then
+      rm -f "$d/.gitkeep" "$d/.gitkeep.meta"; kr=$((kr+1))
+    fi
+  done < <(find "$ASSETS/$root" -type d -print0)
+done
+echo "[OK] gitkeep 보장: 추가 $ka, 불필요 제거 $kr"
+
 # --- 검증 ---
 required=(
   "_Project/Art/Themes/_Template/Prop/Texture" "_Project/Art/Themes/_Template/Animation"
