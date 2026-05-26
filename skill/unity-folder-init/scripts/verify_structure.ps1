@@ -35,7 +35,7 @@ $required = @(
     "_Project/Settings/RenderPipeline","_Project/Settings/Input",
     "_Project/Localization/StringTables","_Project/Localization/AssetTables","_Project/Localization/Locales",
     "_Project/Test/EditMode","_Project/Test/PlayMode",
-    "_Sandbox/_Template",
+    "_Sandbox",
     "Plugins","ThirdParty"
 )
 

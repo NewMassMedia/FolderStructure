@@ -41,7 +41,7 @@ dirs+=(
   _Project/Settings/RenderPipeline _Project/Settings/Input
   _Project/Localization/StringTables _Project/Localization/AssetTables _Project/Localization/Locales
   _Project/Test/EditMode _Project/Test/PlayMode
-  _Sandbox/_Template
+  _Sandbox
   Plugins ThirdParty
 )
 
@@ -53,6 +53,18 @@ for d in "${dirs[@]}"; do
 done
 echo "[OK] $count 개 폴더 생성/확인 (대상: $ASSETS)"
 echo "[i] asmdef는 생성하지 않았습니다 — 코드 작성 시 Features/_Template를 복사해 만드세요."
+
+# _Sandbox 사용법 README (각 디자이너는 _Sandbox/<이름> 폴더를 직접 만들어 자유 실험)
+if [[ ! -f "$ASSETS/_Sandbox/README.md" ]]; then
+  cat > "$ASSETS/_Sandbox/README.md" <<'EOF'
+# _Sandbox
+
+각 디자이너의 개인 실험 공간입니다. `_Sandbox/<내이름>` 폴더를 직접 만들어 자유롭게 작업하세요.
+정해진 하위 구조는 없습니다. 검증이 끝난 결과물은 `_Project` 의 정식 폴더로 옮깁니다.
+
+⚠️ `_Sandbox` 는 릴리스 빌드에서 제외하세요(실험물이 빌드에 섞이지 않도록).
+EOF
+fi
 
 # --- Unity 기본 폴더 마이그레이션 (.meta 동반 이동, GUID 보존) ---
 move_with_meta() { # $1=src file, $2=dest dir
@@ -110,7 +122,7 @@ required=(
   "_Project/UI/Font" "_Project/UI/Animation" "_Project/Prefab/System" "_Project/Prefab/Gameplay"
   "_Project/Scene/Test" "_Project/Script/Features/_Template/Runtime"
   "_Project/ScriptableObject/Events" "_Project/Settings/RenderPipeline"
-  "_Project/Localization/Locales" "_Project/Test/EditMode" "_Sandbox/_Template" "Plugins" "ThirdParty"
+  "_Project/Localization/Locales" "_Project/Test/EditMode" "_Sandbox" "Plugins" "ThirdParty"
 )
 missing=0
 for r in "${required[@]}"; do

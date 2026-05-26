@@ -27,7 +27,7 @@ Assets/
 │  ├─ Settings/{RenderPipeline,Input}
 │  ├─ Localization/{StringTables,AssetTables,Locales}
 │  └─ Test/{EditMode,PlayMode}
-├─ _Sandbox/{_Template, <DesignerName>}  # 개인 실험. 빌드 전 정리
+├─ _Sandbox/<DesignerName>/   # 개인 실험 공간(자유 구조). README.md 안내. 빌드 전 정리
 ├─ Plugins/        # Unity 특수 폴더: 네이티브/플랫폼 바이너리 전용
 └─ ThirdParty/     # 에셋스토어·외부 매니지드 패키지
 ```

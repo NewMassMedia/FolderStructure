@@ -71,7 +71,7 @@ $dirs.AddRange([string[]]@(
     "_Project/Settings/RenderPipeline","_Project/Settings/Input",
     "_Project/Localization/StringTables","_Project/Localization/AssetTables","_Project/Localization/Locales",
     "_Project/Test/EditMode","_Project/Test/PlayMode",
-    "_Sandbox/_Template",
+    "_Sandbox",
     "Plugins","ThirdParty"
 ))
 
@@ -86,6 +86,19 @@ foreach ($d in $dirs) {
 }
 Write-Host "[OK] $created 개 폴더 생성/확인 (대상: $AssetsPath)" -ForegroundColor Green
 Write-Host "[i] asmdef는 생성하지 않았습니다 — 코드 작성 시 Features/_Template를 복사해 만드세요." -ForegroundColor Cyan
+
+# _Sandbox 사용법 README (각 디자이너는 _Sandbox/<이름> 폴더를 직접 만들어 자유 실험)
+$sandboxReadme = Join-Path $AssetsPath "_Sandbox/README.md"
+if (-not (Test-Path $sandboxReadme)) {
+@"
+# _Sandbox
+
+각 디자이너의 개인 실험 공간입니다. ``_Sandbox/<내이름>`` 폴더를 직접 만들어 자유롭게 작업하세요.
+정해진 하위 구조는 없습니다. 검증이 끝난 결과물은 ``_Project`` 의 정식 폴더로 옮깁니다.
+
+⚠️ ``_Sandbox`` 는 릴리스 빌드에서 제외하세요(실험물이 빌드에 섞이지 않도록).
+"@ | Set-Content -Path $sandboxReadme -Encoding utf8
+}
 
 # --- Unity 기본 폴더 마이그레이션 -------------------------------------------
 # 에셋과 .meta를 항상 함께 옮긴다(GUID 보존 → 참조 유지). 같은 이름이 대상에 있으면 건너뛴다.
@@ -140,7 +153,7 @@ if ($MigrateDefaults) {
 $roots = @("_Project","_Sandbox","Plugins","ThirdParty") | ForEach-Object { Join-Path $AssetsPath $_ } | Where-Object { Test-Path $_ }
 $keepAdded = 0; $keepRemoved = 0
 foreach ($root in $roots) {
-    Get-ChildItem -LiteralPath $root -Recurse -Directory | ForEach-Object {
+    @(Get-Item -LiteralPath $root) + @(Get-ChildItem -LiteralPath $root -Recurse -Directory) | ForEach-Object {
         $children = Get-ChildItem -LiteralPath $_.FullName -Force
         $hasSub  = $children | Where-Object { $_.PSIsContainer }
         $real    = $children | Where-Object { -not $_.PSIsContainer -and $_.Name -ne ".gitkeep" }

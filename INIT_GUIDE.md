@@ -48,7 +48,7 @@ cp -r "$src/_Project" "$src/_Sandbox" "$src/Plugins" "$src/ThirdParty" "$dst/"
 3. 이때 생성된 `.meta`들은 **반드시 버전관리에 추가**한다.
 
 ### 4. _Sandbox 개인 폴더 안내
-`_Sandbox/_Template`을 복사해 `_Sandbox/<디자이너이름>` 형태로 각자 만들도록 안내한다.
+`_Sandbox/<디자이너이름>` 폴더를 각자 직접 만들어 자유롭게 쓰도록 안내한다(고정 구조 없음). 사용법은 `_Sandbox/README.md` 참고.
 
 ### 5. 커밋
 ```

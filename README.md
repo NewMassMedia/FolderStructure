@@ -85,9 +85,8 @@ _Project/
 ├─ Settings/      { RenderPipeline, Input }         # URP/HDRP 에셋, Input Action 등
 ├─ Localization/  { StringTables, AssetTables, Locales }   # Unity Localization 패키지
 └─ Test/          { EditMode, PlayMode }           # 코드 테스트 (asmdef 포함)
-_Sandbox/
-├─ _Template/
-└─ <DesignerName>/               # 개인 실험 공간. ★ 빌드 전 반드시 정리
+_Sandbox/                        # 개인 실험 공간(자유 구조). README.md 안내. ★ 빌드 전 반드시 정리
+└─ <DesignerName>/               # 각 디자이너가 직접 만들어 사용
 Plugins/                         # ⚠️ Unity 특수 폴더 — 네이티브/플랫폼 바이너리 전용
 ThirdParty/                      # 에셋스토어·외부 매니지드 패키지
 ```
