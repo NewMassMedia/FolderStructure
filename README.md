@@ -16,18 +16,13 @@
 이 repo에는 Unity Assets 폴더 구조를 한 번에 생성·검증하는 Claude Code 스킬(`unity-folder-init`)이
 `skill/` 폴더에 들어 있습니다. 다른 PC에서 이 repo를 받은 뒤 설치하면 **어느 Unity 프로젝트에서나** 쓸 수 있습니다.
 
-```bash
-git clone https://github.com/NewMassMedia/FolderStructure.git
-cd FolderStructure
-# Windows
-pwsh ./install-skill.ps1
-# macOS / Linux
-./install-skill.sh
-```
+다른 PC에서 이 repo를 clone한 뒤, **Claude에게 "이 repo의 스킬 설치해줘"** 라고 요청하면 됩니다.
+Claude가 `skill/INSTALL.md` 가이드를 따라 `skill/unity-folder-init` 를 `~/.claude/skills/` 로 복사합니다
+(OS에 맞는 복사 명령은 Claude가 알아서 처리). Claude Code를 재시작하면 활성화됩니다.
 
-설치 스크립트는 `skill/unity-folder-init` 를 `~/.claude/skills/` 로 복사합니다.
-Claude Code를 재시작하면 활성화됩니다. Claude에게 **"unity-folder-init 스킬 설치해줘"** 라고 요청하면
-스크립트를 대신 실행해 줍니다. 설치 후에는 대상 Unity 프로젝트에서 **"유니티 폴더 구조 초기화해줘"** 라고 하면 됩니다.
+수동 설치도 가능합니다 — `skill/unity-folder-init` 폴더를 `~/.claude/skills/` 아래로 통째로 복사하면 끝.
+
+설치 후에는 대상 Unity 프로젝트에서 **"유니티 폴더 구조 초기화해줘"** 라고 하면 됩니다.
 
 ---
 
