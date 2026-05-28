@@ -66,6 +66,27 @@ if [[ ! -f "$ASSETS/_Sandbox/README.md" ]]; then
 EOF
 fi
 
+# --- .gitignore: _Sandbox 내용물 무시 (폴더·README만 추적) ---
+# 실제 프로젝트 루트 .gitignore에 idempotent 추가. *.meta 블랭킷 무시는 건드리지 않는다.
+sandbox_gi="$(dirname "$ASSETS")/.gitignore"
+sandbox_leaf="$(basename "$ASSETS")"
+sandbox_mark="/$sandbox_leaf/_Sandbox/**"
+if [[ -f "$sandbox_gi" ]]; then
+  if ! grep -qF "$sandbox_mark" "$sandbox_gi"; then
+    {
+      printf '\n# _Sandbox: 폴더와 README만 추적, 내부 실험물은 전부 무시 (릴리스 빌드 제외)\n'
+      printf '%s\n' "$sandbox_mark"
+      printf '!/%s/_Sandbox/README.md\n' "$sandbox_leaf"
+      printf '!/%s/_Sandbox/README.md.meta\n' "$sandbox_leaf"
+    } >> "$sandbox_gi"
+    echo "[OK] .gitignore에 _Sandbox 규칙 추가"
+  else
+    echo "[i] .gitignore _Sandbox 규칙 이미 존재 — 건너뜀"
+  fi
+else
+  echo "[i] 프로젝트 .gitignore 없음 — _Sandbox 규칙 수동 추가 권장"
+fi
+
 # --- Unity 기본 폴더 마이그레이션 (.meta 동반 이동, GUID 보존) ---
 move_with_meta() { # $1=src file, $2=dest dir
   local src="$1" destdir="$2" name

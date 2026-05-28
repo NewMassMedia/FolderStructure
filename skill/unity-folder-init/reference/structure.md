@@ -27,13 +27,15 @@ Assets/
 │  ├─ Settings/{RenderPipeline,Input}
 │  ├─ Localization/{StringTables,AssetTables,Locales}
 │  └─ Test/{EditMode,PlayMode}
-├─ _Sandbox/<DesignerName>/   # 개인 실험 공간(자유 구조). README.md 안내. 빌드 전 정리
+├─ _Sandbox/<DesignerName>/   # 개인 실험 공간(자유 구조). README만 git 추적, 내부는 .gitignore로 제외. 빌드 전 정리
 ├─ Plugins/        # Unity 특수 폴더: 네이티브/플랫폼 바이너리 전용
 └─ ThirdParty/     # 에셋스토어·외부 매니지드 패키지
 ```
 
 ## 주의
 - **`.meta`** 는 실제 프로젝트에서 항상 커밋 (무시 금지).
+- **`_Sandbox` git 제외**: 스크립트가 프로젝트 `.gitignore`에 `/<Assets>/_Sandbox/**`(README·그 `.meta`는 예외)를
+  추가한다 → 실험물은 커밋되지 않고 폴더·README만 유지. `*.meta` 블랭킷 무시와는 별개.
 - **asmdef** 는 이 스킬이 만들지 않음. 코드 작성 시 `Features/_Template` 복사 후
   `name`/`rootNamespace`를 `Game.<Feature>`로 변경.
 - **예약 폴더**(`Resources`, `StreamingAssets`, `Gizmos`, `Editor Default Resources`)는

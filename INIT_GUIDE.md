@@ -49,6 +49,7 @@ cp -r "$src/_Project" "$src/_Sandbox" "$src/Plugins" "$src/ThirdParty" "$dst/"
 
 ### 4. _Sandbox 개인 폴더 안내
 `_Sandbox/<디자이너이름>` 폴더를 각자 직접 만들어 자유롭게 쓰도록 안내한다(고정 구조 없음). 사용법은 `_Sandbox/README.md` 참고.
+프로젝트 `.gitignore`에 `/Assets/_Sandbox/**` + `!/Assets/_Sandbox/README.md`(및 `.meta`) 규칙을 추가해 **개인 실험물은 커밋되지 않고 폴더·README만 공유**되게 한다. (create_structure 스크립트는 이 규칙을 자동 주입한다.)
 
 ### 5. 커밋
 ```
@@ -73,7 +74,7 @@ git commit -m "Initialize Assets folder structure from template"
 
 ## 생성 후 추가 작업
 - **asmdef 이름 변경:** 복사한 feature의 `_Template` asmdef는 `name`이 `Game.FeatureTemplate*`로 되어 있다. 새 feature를 만들 땐 `_Template`을 복사한 뒤 asmdef의 `name`·`rootNamespace`를 `Game.<FeatureName>` 형태로 바꾼다. (asmdef는 이름 기반 참조이므로 GUID 수정은 불필요)
-- **_Sandbox 빌드 배제:** `_Sandbox`는 실험용이므로 빌드 스크립트/씬 목록/Addressables 그룹에서 제외하고, 릴리스 전에 정리한다.
+- **_Sandbox 빌드 배제 + git 제외:** `_Sandbox`는 실험용이므로 빌드 스크립트/씬 목록/Addressables 그룹에서 제외하고, 릴리스 전에 정리한다. 또한 프로젝트 `.gitignore`에 `/Assets/_Sandbox/**`(README·`.meta`는 예외)를 두어 개인 실험물이 커밋되지 않게 한다.
 - **Editor 코드 정책:** feature 전용 에디터 코드는 feature의 `Editor` asmdef에, 프로젝트 전역 도구만 `Script/Editor`에 둔다.
 - **예약 폴더 주의:** `Resources/`, `StreamingAssets/`, `Gizmos/`, `Editor Default Resources/`는 Unity 특수 폴더다. 이 구조의 일반 폴더 대신 임의로 만들지 말고, 정말 필요할 때만 의도적으로 생성한다. 런타임 로딩은 Addressables를 사용한다.
 

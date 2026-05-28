@@ -100,6 +100,24 @@ if (-not (Test-Path $sandboxReadme)) {
 "@ | Set-Content -Path $sandboxReadme -Encoding utf8
 }
 
+# --- .gitignore: _Sandbox 내용물 무시 (폴더·README만 추적) -------------------
+# 실제 프로젝트 루트 .gitignore에 idempotent 추가. *.meta 블랭킷 무시는 건드리지 않는다.
+$projGitignore = Join-Path $projectRoot ".gitignore"
+$sandboxMark = "/$leaf/_Sandbox/**"
+if (Test-Path $projGitignore) {
+    $giText = (Get-Content -LiteralPath $projGitignore -Raw)
+    if (-not $giText) { $giText = "" }
+    if (-not $giText.Contains($sandboxMark)) {
+        $block = "`n# _Sandbox: 폴더와 README만 추적, 내부 실험물은 전부 무시 (릴리스 빌드 제외)`n$sandboxMark`n!/$leaf/_Sandbox/README.md`n!/$leaf/_Sandbox/README.md.meta`n"
+        Add-Content -LiteralPath $projGitignore -Value $block -Encoding utf8
+        Write-Host "[OK] .gitignore에 _Sandbox 규칙 추가" -ForegroundColor Green
+    } else {
+        Write-Host "[i] .gitignore _Sandbox 규칙 이미 존재 — 건너뜀" -ForegroundColor Cyan
+    }
+} else {
+    Write-Host "[i] 프로젝트 .gitignore 없음 — _Sandbox 규칙 수동 추가 권장" -ForegroundColor Yellow
+}
+
 # --- Unity 기본 폴더 마이그레이션 -------------------------------------------
 # 에셋과 .meta를 항상 함께 옮긴다(GUID 보존 → 참조 유지). 같은 이름이 대상에 있으면 건너뛴다.
 function Move-AssetWithMeta {
