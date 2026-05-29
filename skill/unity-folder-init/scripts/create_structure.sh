@@ -42,7 +42,9 @@ dirs+=(
   _Project/Localization/StringTables _Project/Localization/AssetTables _Project/Localization/Locales
   _Project/Test/EditMode _Project/Test/PlayMode
   _Sandbox
-  Plugins ThirdParty
+  # Plugins: 네이티브/플랫폼 바이너리 전용. ThirdParty: 카테고리 → 패키지(폴더 통째로 유지)
+  Plugins
+  ThirdParty/Libraries ThirdParty/Art ThirdParty/Audio ThirdParty/Tools
 )
 
 count=0
@@ -143,7 +145,8 @@ required=(
   "_Project/UI/Font" "_Project/UI/Animation/Controller" "_Project/UI/Animation/Clip" "_Project/Prefab/System" "_Project/Prefab/Gameplay"
   "_Project/Scene/Test" "_Project/Script/Features/_Template/Runtime"
   "_Project/ScriptableObject/Events" "_Project/Settings/RenderPipeline"
-  "_Project/Localization/Locales" "_Project/Test/EditMode" "_Sandbox" "Plugins" "ThirdParty"
+  "_Project/Localization/Locales" "_Project/Test/EditMode" "_Sandbox" "Plugins"
+  "ThirdParty/Libraries" "ThirdParty/Art" "ThirdParty/Audio" "ThirdParty/Tools"
 )
 missing=0
 for r in "${required[@]}"; do

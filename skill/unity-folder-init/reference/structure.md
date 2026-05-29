@@ -28,8 +28,12 @@ Assets/
 │  ├─ Localization/{StringTables,AssetTables,Locales}
 │  └─ Test/{EditMode,PlayMode}
 ├─ _Sandbox/<DesignerName>/   # 개인 실험 공간(자유 구조). README만 git 추적, 내부는 .gitignore로 제외. 빌드 전 정리
-├─ Plugins/        # Unity 특수 폴더: 네이티브/플랫폼 바이너리 전용
-└─ ThirdParty/     # 에셋스토어·외부 매니지드 패키지
+├─ Plugins/        # Unity 특수 폴더: 네이티브/플랫폼 바이너리(.jslib/.dll/.so/.bundle) 전용. 순수 C#은 두지 않음
+└─ ThirdParty/     # 외부 에셋·패키지. 카테고리 → 패키지(폴더 통째로 유지)
+   ├─ Libraries/   # 순수 코드 라이브러리 (예: BreakInfinity)
+   ├─ Art/         # 모델·텍스처·머티리얼 팩
+   ├─ Audio/       # 사운드 팩
+   └─ Tools/       # 에디터·디버그 툴 (예: Graphy)
 ```
 
 ## 주의
@@ -41,3 +45,4 @@ Assets/
 - **예약 폴더**(`Resources`, `StreamingAssets`, `Gizmos`, `Editor Default Resources`)는
   임의 생성 금지. 런타임 로딩은 Addressables 사용.
 - **Prefab 3종 분리**: 아트 → 콘텐츠 폴더 안 Prefab, UI → UI/Prefab, 시스템 → _Project/Prefab.
+- **Plugins vs ThirdParty**: `Plugins`는 네이티브/플랫폼 바이너리 전용(.jslib/.dll/.so/.bundle). 순수 C#·매니지드 라이브러리·에셋스토어 패키지는 `ThirdParty`로. `ThirdParty`는 **카테고리(`Libraries`/`Art`/`Audio`/`Tools`) → 패키지** 구조이고, **한 패키지는 타입별로 쪼개지 않고 자기 폴더에 통째로**(스크립트+모델+텍스처 다) 둔다 — 업데이트·삭제를 한 단위로 하기 위함.

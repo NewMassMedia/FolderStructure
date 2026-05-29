@@ -39,7 +39,8 @@ $required = @(
     "_Project/Localization/StringTables","_Project/Localization/AssetTables","_Project/Localization/Locales",
     "_Project/Test/EditMode","_Project/Test/PlayMode",
     "_Sandbox",
-    "Plugins","ThirdParty"
+    "Plugins",
+    "ThirdParty/Libraries","ThirdParty/Art","ThirdParty/Audio","ThirdParty/Tools"
 )
 
 $missing = @()

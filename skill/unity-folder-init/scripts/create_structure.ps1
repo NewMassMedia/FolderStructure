@@ -72,7 +72,10 @@ $dirs.AddRange([string[]]@(
     "_Project/Localization/StringTables","_Project/Localization/AssetTables","_Project/Localization/Locales",
     "_Project/Test/EditMode","_Project/Test/PlayMode",
     "_Sandbox",
-    "Plugins","ThirdParty"
+    # Plugins: Unity 특수 폴더 — 네이티브/플랫폼 바이너리(.jslib/.dll/.so/.bundle)만. 순수 C# 라이브러리는 ThirdParty로.
+    "Plugins",
+    # ThirdParty: 카테고리 → 패키지. 한 패키지는 타입별로 쪼개지 말고 폴더 통째로 유지.
+    "ThirdParty/Libraries","ThirdParty/Art","ThirdParty/Audio","ThirdParty/Tools"
 ))
 
 # --- 생성 --------------------------------------------------------------------

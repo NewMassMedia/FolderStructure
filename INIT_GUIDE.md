@@ -69,6 +69,7 @@ git commit -m "Initialize Assets folder structure from template"
 - [ ] `Assets/_Project/Script/Features/_Template`에 `Runtime/Editor/Tests`와 `.asmdef` 3종이 있다.
 - [ ] `Assets/_Project/ScriptableObject`에 `Config/Data/Events`가 있다.
 - [ ] `Assets/_Project/Settings`에 `RenderPipeline/Input`, `Assets/_Project/Localization`에 `StringTables/AssetTables/Locales`가 있다.
+- [ ] `Assets/ThirdParty`에 `Libraries/Art/Audio/Tools`가 있다.
 - [ ] 대상 프로젝트 `.gitignore`에 `*.meta` 무시 패턴이 **없다.**
 - [ ] Unity가 생성한 `.meta` 파일들이 git에 스테이징되어 있다.
 
@@ -77,6 +78,7 @@ git commit -m "Initialize Assets folder structure from template"
 - **_Sandbox 빌드 배제 + git 제외:** `_Sandbox`는 실험용이므로 빌드 스크립트/씬 목록/Addressables 그룹에서 제외하고, 릴리스 전에 정리한다. 또한 프로젝트 `.gitignore`에 `/Assets/_Sandbox/**`(README·`.meta`는 예외)를 두어 개인 실험물이 커밋되지 않게 한다.
 - **Editor 코드 정책:** feature 전용 에디터 코드는 feature의 `Editor` asmdef에, 프로젝트 전역 도구만 `Script/Editor`에 둔다.
 - **예약 폴더 주의:** `Resources/`, `StreamingAssets/`, `Gizmos/`, `Editor Default Resources/`는 Unity 특수 폴더다. 이 구조의 일반 폴더 대신 임의로 만들지 말고, 정말 필요할 때만 의도적으로 생성한다. 런타임 로딩은 Addressables를 사용한다.
+- **Plugins / ThirdParty 배치:** `Plugins`에는 네이티브/플랫폼 바이너리(.jslib/.dll/.so/.bundle)만 둔다. 외부 에셋스토어/라이브러리는 `ThirdParty/<카테고리>/<패키지>`(`Libraries`/`Art`/`Audio`/`Tools`)에 **패키지 단위로 통째로** 둔다(타입별로 쪼개지 않음). 순수 C# 라이브러리는 `Plugins`가 아니라 `ThirdParty/Libraries`로.
 
 ## 새 테마/캐릭터/Feature 생성 규칙
 - `_Template` 폴더를 복사하고 이름만 바꾼다. 하위 타입 폴더 구조는 변경하지 않는다.
