@@ -128,7 +128,7 @@ ThirdParty/                      # 외부 에셋·패키지 — 카테고리 →
 
 | 종류 | Prefix | 예시 |
 |------|--------|------|
-| Texture | `T_` | `T_Wall_BaseColor` |
+| Texture | `T_` | `T_Wall_BC` |
 | Material | `M_` | `M_Wall` |
 | Mesh | `SM_` | `SM_Chair` |
 | Skinned Mesh | `SKM_` | `SKM_CharacterA` |
@@ -145,11 +145,27 @@ ThirdParty/                      # 외부 에셋·패키지 — 카테고리 →
 | Shader | `SH_` | `SH_Water` |
 | Scene | `SC_` | `SC_ThemeA_Main` |
 
-**텍스처 맵 접미사:** `_BaseColor`, `_Normal`, `_MRA`(Metallic/Roughness/AO), `_Emission`, `_Height`
+**텍스처 맵 접미사 (URP/HDRP 기준, 짧은 코드):**
+
+| 맵 | 접미사 |
+|------|--------|
+| BaseColor (Albedo) | `_BC` |
+| Normal | `_N` |
+| Metallic + Smoothness | `_MS` |
+| Ambient Occlusion | `_AO` |
+| Emission | `_E` |
+| Height | `_H` |
+| Mask | `_M` |
+| Alpha / Opacity | `_A` |
+
+- **패킹맵은 채널 글자를 순서대로 스택**한다: `_MS`(Metallic+Smoothness — Unity Metallic 맵의 RGB=Metallic / A=Smoothness 구조), AO까지 묶으면 `_MSA` 식으로 채널을 명시. 글자 하나라도 줄여 채널 순서를 잃지 말 것.
+- **`_A`는 Alpha/Opacity 예약** — Albedo에 쓰지 않는다(BaseColor는 `_BC`). 업계 표준 가이드들이 `_A`를 Alpha에 배정하므로 충돌한다.
+- **`_M`은 Mask 예약** — Metallic은 단독으로 두지 말고 `_MS`로 패킹한다.
+- `_N`으로 끝나는 텍스처는 Unity가 임포트 시 노멀맵으로 인식·제안한다.
 
 > **경로 vs 파일명 중복에 대해:** 파일이 `Themes/ThemeA/...`에 있으면 파일명에 `ThemeA`를 또 넣을지는 선택입니다.
 > 위 예시는 경로에 컨텍스트가 있다고 보고 생략했습니다. 단, 로그·검색·에셋 이동 시 **전역 고유성**이 중요하면
-> `T_ThemeA_Wall_BaseColor`처럼 접두에 콘텐츠명을 넣는 방식도 합리적입니다. 팀에서 한 방식으로 통일하세요.
+> `T_ThemeA_Wall_BC`처럼 접두에 콘텐츠명을 넣는 방식도 합리적입니다. 팀에서 한 방식으로 통일하세요.
 
 ---
 
