@@ -25,7 +25,7 @@
 
 PowerShell 예시:
 ```powershell
-$src = "F:\Git\Unity\FolderStructure"
+$src = "<이 repo 경로>"        # 예: C:\Git\FolderStructure
 $dst = "<대상프로젝트>\Assets"
 foreach ($d in '_Project','_Sandbox','Plugins','ThirdParty') {
     Copy-Item -Path (Join-Path $src $d) -Destination $dst -Recurse -Force
@@ -34,9 +34,12 @@ foreach ($d in '_Project','_Sandbox','Plugins','ThirdParty') {
 
 bash 예시:
 ```bash
-src="F:/Git/Unity/FolderStructure"; dst="<대상프로젝트>/Assets"
+src="<이 repo 경로>"; dst="<대상프로젝트>/Assets"   # 예: ~/Git/FolderStructure
 cp -r "$src/_Project" "$src/_Sandbox" "$src/Plugins" "$src/ThirdParty" "$dst/"
 ```
+
+> 참고: 위는 **수동 복사** 절차이며, 폴더와 함께 템플릿 asmdef 5종도 따라온다.
+> 스킬 스크립트(`create_structure.sh/.ps1`)로 초기화하면 동일한 asmdef 5종이 idempotent하게 생성되어 결과가 같다.
 
 ### 2. 템플릿 메타파일 흔적 제거
 - 대상으로 README.md, INIT_GUIDE.md, 이 리포의 `.gitignore`는 **복사하지 않는다.**
@@ -60,7 +63,7 @@ git commit -m "Initialize Assets folder structure from template"
 
 ## 검증 체크리스트
 - [ ] `Assets/_Project/Art/Themes/_Template`이 존재하고 `Prop`,`Environment` 하위에 `Texture/Material/Mesh/Prefab`가 있다.
-- [ ] `Assets/_Project/Art/Themes/_Template`의 각 테마 폴더에 `Prop/Environment`(+`Texture/Material/Mesh/Prefab`)와 테마 레벨 `Animation/VFX/Audio`가 있다.
+- [ ] 각 테마 폴더(`_Template`/`ThemeA` 등)에 `Prop/Environment`(+`Texture/Material/Mesh/Prefab`)와 테마 레벨 `Animation/VFX/Audio`가 있다.
 - [ ] `Assets/_Project/Art/Characters/_Template`에 `Mesh/Texture/Material/Animation/Prefab`가 있다.
 - [ ] `Assets/_Project/Prefab`에 `System/Gameplay`가 있다(아트가 아닌 시스템/게임플레이 프리팹용).
 - [ ] `Assets/_Project/UI/Font`가 존재한다.

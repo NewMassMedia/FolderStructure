@@ -43,25 +43,41 @@ $required = @(
     "ThirdParty/Libraries","ThirdParty/Art","ThirdParty/Audio","ThirdParty/Tools"
 )
 
+# 반드시 존재해야 하는 asmdef 파일 (create_structure가 생성하므로 검증으로 누락을 가리지 않는다)
+$requiredFiles = @(
+    "_Project/Script/Features/_Template/Runtime/Game.FeatureTemplate.asmdef",
+    "_Project/Script/Features/_Template/Editor/Game.FeatureTemplate.Editor.asmdef",
+    "_Project/Script/Features/_Template/Tests/Game.FeatureTemplate.Tests.asmdef",
+    "_Project/Test/EditMode/Game.EditModeTests.asmdef",
+    "_Project/Test/PlayMode/Game.PlayModeTests.asmdef"
+)
+
 $missing = @()
 foreach ($r in $required) {
-    if (-not (Test-Path (Join-Path $AssetsPath $r))) { $missing += $r }
+    if (-not (Test-Path (Join-Path $AssetsPath $r))) { $missing += "폴더: $r" }
+}
+foreach ($r in $requiredFiles) {
+    if (-not (Test-Path (Join-Path $AssetsPath $r))) { $missing += "asmdef: $r" }
 }
 
 Write-Host ""
 Write-Host "=== 검증 결과 ===" -ForegroundColor White
 if ($missing.Count -eq 0) {
-    Write-Host "[PASS] 핵심 폴더 $($required.Count)개 모두 존재합니다." -ForegroundColor Green
+    Write-Host "[PASS] 핵심 폴더 $($required.Count)개 + asmdef $($requiredFiles.Count)개 모두 존재합니다." -ForegroundColor Green
 } else {
-    Write-Host "[FAIL] 누락된 폴더 $($missing.Count)개:" -ForegroundColor Red
+    Write-Host "[FAIL] 누락 $($missing.Count)개:" -ForegroundColor Red
     $missing | ForEach-Object { Write-Host "  - $_" -ForegroundColor Red }
 }
 
 # .meta 무시 여부 경고 (실제 프로젝트에서 치명적)
+# *.meta / .meta / **/*.meta / [Aa]ssets/**/*.meta 등을 폭넓게 탐지(부정 규칙 ! 과 주석 # 제외)
 $projectRoot = Split-Path $AssetsPath -Parent
 $gitignore = Join-Path $projectRoot ".gitignore"
 if (Test-Path $gitignore) {
-    $hasMetaIgnore = Select-String -Path $gitignore -Pattern '^\s*\*?\.meta\s*$' -Quiet
+    $hasMetaIgnore = (Get-Content -LiteralPath $gitignore) |
+        Where-Object { $_ -notmatch '^\s*[!#]' } |
+        Where-Object { $_ -match '(^|\s|/)\*?\.meta\s*$' } |
+        Select-Object -First 1
     if ($hasMetaIgnore) {
         Write-Host "[경고] .gitignore가 *.meta를 무시합니다 — Unity 팀 협업이 깨집니다. 해당 패턴을 제거하세요!" -ForegroundColor Yellow
     } else {

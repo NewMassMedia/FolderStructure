@@ -88,7 +88,127 @@ foreach ($d in $dirs) {
     $created++
 }
 Write-Host "[OK] $created 개 폴더 생성/확인 (대상: $AssetsPath)" -ForegroundColor Green
-Write-Host "[i] asmdef는 생성하지 않았습니다 — 코드 작성 시 Features/_Template를 복사해 만드세요." -ForegroundColor Cyan
+
+# --- asmdef 생성 (Feature _Template 3종 + Test 2종, idempotent) ---------------
+# 기존 파일은 덮어쓰지 않는다(사용자 수정 보존). 수동 복사 경로(README)와 결과를 일치시킨다.
+function Write-AsmdefIfAbsent {
+    param([string]$RelPath, [string]$Content)
+    $full = Join-Path $AssetsPath $RelPath
+    if (Test-Path $full) { Write-Host "  이미 존재: $RelPath" -ForegroundColor DarkGray; return }
+    New-Item -ItemType Directory -Path (Split-Path $full -Parent) -Force | Out-Null
+    Set-Content -LiteralPath $full -Value $Content -Encoding utf8
+    Write-Host "  생성: $RelPath" -ForegroundColor DarkGray
+}
+Write-Host "[i] asmdef 생성 (idempotent)..." -ForegroundColor Cyan
+Write-AsmdefIfAbsent "_Project/Script/Features/_Template/Runtime/Game.FeatureTemplate.asmdef" @'
+{
+    "name": "Game.FeatureTemplate",
+    "rootNamespace": "Game.FeatureTemplate",
+    "references": [],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
+'@
+Write-AsmdefIfAbsent "_Project/Script/Features/_Template/Editor/Game.FeatureTemplate.Editor.asmdef" @'
+{
+    "name": "Game.FeatureTemplate.Editor",
+    "rootNamespace": "Game.FeatureTemplate.Editor",
+    "references": [
+        "Game.FeatureTemplate"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
+'@
+Write-AsmdefIfAbsent "_Project/Script/Features/_Template/Tests/Game.FeatureTemplate.Tests.asmdef" @'
+{
+    "name": "Game.FeatureTemplate.Tests",
+    "rootNamespace": "Game.FeatureTemplate.Tests",
+    "references": [
+        "Game.FeatureTemplate",
+        "UnityEngine.TestRunner",
+        "UnityEditor.TestRunner"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "nunit.framework.dll"
+    ],
+    "autoReferenced": false,
+    "defineConstraints": [
+        "UNITY_INCLUDE_TESTS"
+    ],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
+'@
+Write-AsmdefIfAbsent "_Project/Test/EditMode/Game.EditModeTests.asmdef" @'
+{
+    "name": "Game.EditModeTests",
+    "rootNamespace": "Game.Tests.EditMode",
+    "references": [
+        "UnityEngine.TestRunner",
+        "UnityEditor.TestRunner"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "nunit.framework.dll"
+    ],
+    "autoReferenced": false,
+    "defineConstraints": [
+        "UNITY_INCLUDE_TESTS"
+    ],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
+'@
+Write-AsmdefIfAbsent "_Project/Test/PlayMode/Game.PlayModeTests.asmdef" @'
+{
+    "name": "Game.PlayModeTests",
+    "rootNamespace": "Game.Tests.PlayMode",
+    "references": [
+        "UnityEngine.TestRunner",
+        "UnityEditor.TestRunner"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "nunit.framework.dll"
+    ],
+    "autoReferenced": false,
+    "defineConstraints": [
+        "UNITY_INCLUDE_TESTS"
+    ],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
+'@
+Write-Host "[i] 새 feature는 Features/_Template를 복사하고 asmdef name/rootNamespace를 Game.<Feature>로 바꾸세요." -ForegroundColor Cyan
 
 # _Sandbox 사용법 README (각 디자이너는 _Sandbox/<이름> 폴더를 직접 만들어 자유 실험)
 $sandboxReadme = Join-Path $AssetsPath "_Sandbox/README.md"

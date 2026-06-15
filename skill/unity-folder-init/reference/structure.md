@@ -40,7 +40,8 @@ Assets/
 - **`.meta`** 는 실제 프로젝트에서 항상 커밋 (무시 금지).
 - **`_Sandbox` git 제외**: 스크립트가 프로젝트 `.gitignore`에 `/<Assets>/_Sandbox/**`(README·그 `.meta`는 예외)를
   추가한다 → 실험물은 커밋되지 않고 폴더·README만 유지. `*.meta` 블랭킷 무시와는 별개.
-- **asmdef** 는 이 스킬이 만들지 않음. 코드 작성 시 `Features/_Template` 복사 후
+- **asmdef** 는 스크립트가 템플릿 5종을 생성(idempotent): Feature `_Template`의 `Runtime`/`Editor`/`Tests`
+  + `Test/EditMode`·`Test/PlayMode`. 이미 있으면 덮어쓰지 않음. 새 feature는 `Features/_Template` 복사 후
   `name`/`rootNamespace`를 `Game.<Feature>`로 변경.
 - **예약 폴더**(`Resources`, `StreamingAssets`, `Gizmos`, `Editor Default Resources`)는
   임의 생성 금지. 런타임 로딩은 Addressables 사용.

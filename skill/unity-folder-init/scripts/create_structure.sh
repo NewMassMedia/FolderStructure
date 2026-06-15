@@ -54,7 +54,126 @@ for d in "${dirs[@]}"; do
   count=$((count+1))
 done
 echo "[OK] $count 개 폴더 생성/확인 (대상: $ASSETS)"
-echo "[i] asmdef는 생성하지 않았습니다 — 코드 작성 시 Features/_Template를 복사해 만드세요."
+
+# --- asmdef 생성 (Feature _Template 3종 + Test 2종, idempotent) ---
+# 기존 파일은 덮어쓰지 않는다(사용자 수정 보존). 수동 복사 경로(README)와 결과를 일치시킨다.
+write_asmdef() { # $1=상대경로  stdin=내용 (없을 때만 생성)
+  local p="$ASSETS/$1"
+  if [[ -f "$p" ]]; then echo "  이미 존재: $1"; return; fi
+  mkdir -p "$(dirname "$p")"
+  cat > "$p"
+  echo "  생성: $1"
+}
+echo "[i] asmdef 생성 (idempotent)..."
+write_asmdef "_Project/Script/Features/_Template/Runtime/Game.FeatureTemplate.asmdef" <<'EOF'
+{
+    "name": "Game.FeatureTemplate",
+    "rootNamespace": "Game.FeatureTemplate",
+    "references": [],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
+EOF
+write_asmdef "_Project/Script/Features/_Template/Editor/Game.FeatureTemplate.Editor.asmdef" <<'EOF'
+{
+    "name": "Game.FeatureTemplate.Editor",
+    "rootNamespace": "Game.FeatureTemplate.Editor",
+    "references": [
+        "Game.FeatureTemplate"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
+EOF
+write_asmdef "_Project/Script/Features/_Template/Tests/Game.FeatureTemplate.Tests.asmdef" <<'EOF'
+{
+    "name": "Game.FeatureTemplate.Tests",
+    "rootNamespace": "Game.FeatureTemplate.Tests",
+    "references": [
+        "Game.FeatureTemplate",
+        "UnityEngine.TestRunner",
+        "UnityEditor.TestRunner"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "nunit.framework.dll"
+    ],
+    "autoReferenced": false,
+    "defineConstraints": [
+        "UNITY_INCLUDE_TESTS"
+    ],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
+EOF
+write_asmdef "_Project/Test/EditMode/Game.EditModeTests.asmdef" <<'EOF'
+{
+    "name": "Game.EditModeTests",
+    "rootNamespace": "Game.Tests.EditMode",
+    "references": [
+        "UnityEngine.TestRunner",
+        "UnityEditor.TestRunner"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "nunit.framework.dll"
+    ],
+    "autoReferenced": false,
+    "defineConstraints": [
+        "UNITY_INCLUDE_TESTS"
+    ],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
+EOF
+write_asmdef "_Project/Test/PlayMode/Game.PlayModeTests.asmdef" <<'EOF'
+{
+    "name": "Game.PlayModeTests",
+    "rootNamespace": "Game.Tests.PlayMode",
+    "references": [
+        "UnityEngine.TestRunner",
+        "UnityEditor.TestRunner"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "nunit.framework.dll"
+    ],
+    "autoReferenced": false,
+    "defineConstraints": [
+        "UNITY_INCLUDE_TESTS"
+    ],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
+EOF
+echo "[i] 새 feature는 Features/_Template를 복사하고 asmdef name/rootNamespace를 Game.<Feature>로 바꾸세요."
 
 # _Sandbox 사용법 README (각 디자이너는 _Sandbox/<이름> 폴더를 직접 만들어 자유 실험)
 if [[ ! -f "$ASSETS/_Sandbox/README.md" ]]; then
@@ -137,26 +256,62 @@ for root in _Project _Sandbox Plugins ThirdParty; do
 done
 echo "[OK] gitkeep 보장: 추가 $ka, 불필요 제거 $kr"
 
-# --- 검증 ---
+# --- 검증 (verify_structure.ps1과 동일한 목록을 유지할 것) ---
 required=(
-  "_Project/Art/Themes/_Template/Prop/Texture" "_Project/Art/Themes/_Template/Animation/Controller"
-  "_Project/Art/Themes/_Template/Animation/Clip" "_Project/Art/Themes/_Template/VFX" "_Project/Art/Themes/_Template/Audio"
-  "_Project/Art/Characters/_Template/Mesh" "_Project/Art/Timeline"
-  "_Project/UI/Font" "_Project/UI/Animation/Controller" "_Project/UI/Animation/Clip" "_Project/Prefab/System" "_Project/Prefab/Gameplay"
-  "_Project/Scene/Test" "_Project/Script/Features/_Template/Runtime"
-  "_Project/ScriptableObject/Events" "_Project/Settings/RenderPipeline"
-  "_Project/Localization/Locales" "_Project/Test/EditMode" "_Sandbox" "Plugins"
+  "_Project/Art/Themes/_Template/Prop/Texture"
+  "_Project/Art/Themes/_Template/Environment/Material"
+  "_Project/Art/Themes/_Template/Animation/Controller"
+  "_Project/Art/Themes/_Template/Animation/Clip"
+  "_Project/Art/Themes/_Template/VFX"
+  "_Project/Art/Themes/_Template/Audio"
+  "_Project/Art/Themes/_Shared/Texture"
+  "_Project/Art/Characters/_Template/Mesh"
+  "_Project/Art/Characters/_Template/Animation/Controller"
+  "_Project/Art/Characters/_Template/Animation/Clip"
+  "_Project/Art/Timeline"
+  "_Project/UI/Font"
+  "_Project/UI/Animation/Controller"
+  "_Project/UI/Animation/Clip"
+  "_Project/UI/UIToolkit/USS"
+  "_Project/Prefab/System"
+  "_Project/Prefab/Gameplay"
+  "_Project/Scene/Dev" "_Project/Scene/Production" "_Project/Scene/UI" "_Project/Scene/Test"
+  "_Project/Script/Core" "_Project/Script/Editor"
+  "_Project/Script/Features/_Template/Runtime"
+  "_Project/Script/Features/_Template/Editor"
+  "_Project/Script/Features/_Template/Tests"
+  "_Project/ScriptableObject/Config" "_Project/ScriptableObject/Data" "_Project/ScriptableObject/Events"
+  "_Project/Settings/RenderPipeline" "_Project/Settings/Input"
+  "_Project/Localization/StringTables" "_Project/Localization/AssetTables" "_Project/Localization/Locales"
+  "_Project/Test/EditMode" "_Project/Test/PlayMode"
+  "_Sandbox" "Plugins"
   "ThirdParty/Libraries" "ThirdParty/Art" "ThirdParty/Audio" "ThirdParty/Tools"
+)
+# 반드시 존재해야 하는 asmdef 파일 (스크립트가 생성하므로 검증으로 누락을 가리지 않는다)
+required_files=(
+  "_Project/Script/Features/_Template/Runtime/Game.FeatureTemplate.asmdef"
+  "_Project/Script/Features/_Template/Editor/Game.FeatureTemplate.Editor.asmdef"
+  "_Project/Script/Features/_Template/Tests/Game.FeatureTemplate.Tests.asmdef"
+  "_Project/Test/EditMode/Game.EditModeTests.asmdef"
+  "_Project/Test/PlayMode/Game.PlayModeTests.asmdef"
 )
 missing=0
 for r in "${required[@]}"; do
-  [[ -d "$ASSETS/$r" ]] || { echo "[FAIL] 누락: $r"; missing=$((missing+1)); }
+  [[ -d "$ASSETS/$r" ]] || { echo "[FAIL] 누락(폴더): $r"; missing=$((missing+1)); }
+done
+for r in "${required_files[@]}"; do
+  [[ -f "$ASSETS/$r" ]] || { echo "[FAIL] 누락(asmdef): $r"; missing=$((missing+1)); }
 done
 echo ""
-if [[ $missing -eq 0 ]]; then echo "[PASS] 핵심 폴더 ${#required[@]}개 모두 존재합니다."; else echo "[FAIL] 누락 $missing 개"; fi
+if [[ $missing -eq 0 ]]; then
+  echo "[PASS] 핵심 폴더 ${#required[@]}개 + asmdef ${#required_files[@]}개 모두 존재합니다."
+else
+  echo "[FAIL] 누락 $missing 개"
+fi
 
 gi="$(dirname "$ASSETS")/.gitignore"
-if [[ -f "$gi" ]] && grep -Eq '^\s*\*?\.meta\s*$' "$gi"; then
+# *.meta / .meta / **/*.meta / [Aa]ssets/**/*.meta 등 .meta 무시 패턴을 폭넓게 탐지(부정 규칙 ! 제외)
+if [[ -f "$gi" ]] && grep -v '^[[:space:]]*[!#]' "$gi" | grep -Eq '(^|[[:space:]]|/)\*?\.meta[[:space:]]*$'; then
   echo "[경고] .gitignore가 *.meta를 무시합니다 — Unity 협업이 깨집니다. 제거하세요!"
 fi
 [[ $missing -eq 0 ]] || exit 1
